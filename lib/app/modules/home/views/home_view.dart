@@ -18,6 +18,9 @@ class HomeView extends GetView<HomeController> {
 
     var tabTextIndexSelected = 0;
 
+    var ratio = ((itemWidth - 18) / itemHeight);
+    print(ratio);
+
     // final HomeController controller = HomeController();
 
     return Scaffold(
@@ -95,8 +98,8 @@ class HomeView extends GetView<HomeController> {
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 0,
-                  mainAxisSpacing: 20,
-                  childAspectRatio: ((itemWidth - 10) / itemHeight),
+                  mainAxisSpacing: 5,
+                  childAspectRatio: ratio,
                 ),
                 controller: new ScrollController(keepScrollOffset: false),
                 shrinkWrap: true,
@@ -104,8 +107,8 @@ class HomeView extends GetView<HomeController> {
                 itemCount: data?.length,
                 itemBuilder: (context, index) {
                   return MovieCard(
-                    title: data?[index]['title'],
-                    posterPath: data?[index]['poster_path'],
+                    title: data?[index].title,
+                    posterPath: data?[index].posterPath,
                   );
                 },
 
@@ -175,7 +178,7 @@ class MovieCard extends StatelessWidget {
     var size = MediaQuery.of(context).size;
 
     /*24 is for notification bar on Android*/
-    final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
+    // final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
     final double itemWidth = size.width / 2;
 
     return Card(
@@ -219,12 +222,18 @@ class MovieCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 8),
-          Text(
-            title,
-            textAlign: TextAlign.left,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            // height: 50,
+            child: Text(
+              title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              softWrap: true,
+              textAlign: TextAlign.left,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           SizedBox(height: 8),

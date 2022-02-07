@@ -1,18 +1,27 @@
 import 'dart:ffi';
+import 'dart:convert';
 
 class MovieHomeModel {
-  List<Results>? results;
+  final List<Results>? results;
 
   MovieHomeModel({this.results});
 
-  MovieHomeModel.fromJson(Map<String, dynamic> json) {
-    if (json['results'] != null) {
-      results = <Results>[];
-      json['results'].forEach((v) {
-        results?.add(Results.fromJson(v));
-      });
-    }
-  }
+  // MovieHomeModel.fromJson(Map<String, dynamic> json) {
+  //   if (json['results'] != null) {
+  //     results = <Results>[];
+  //     json['results'].forEach((v) {
+  //       results?.add(Results.fromJson(v));
+  //     });
+  //   }
+  // }
+
+  static MovieHomeModel fromJson(dynamic json) => MovieHomeModel(
+      results: json['results'] == null
+          ? null
+          : List<Results>.from(
+              (json["results"] as List<dynamic>)
+                  .map((x) => Results.fromJson(x as Map<String, dynamic>)),
+            ));
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
@@ -26,36 +35,50 @@ class MovieHomeModel {
 class Results {
   String? id;
   String? title;
-  String? voteAverage;
   String? posterPath;
-  Bool? adult;
-  List<String>? genreIds = [];
+  List<dynamic>? genreIds = [];
+  double? voteAverage;
+  bool? adult;
 
-  Results(
-      {this.id,
-      this.title,
-      this.voteAverage,
-      this.posterPath,
-      this.adult,
-      this.genreIds});
+  Results({
+    this.id,
+    this.title,
+    this.voteAverage,
+    this.posterPath,
+    this.adult,
+    this.genreIds,
+  });
 
   Results.fromJson(Map<String, dynamic> json) {
     id = json['id'].toString();
     title = json['title'];
-    voteAverage = json['voteAverage'];
-    posterPath = json['posterPath'];
+    voteAverage = checkDouble(json['vote_average']);
+    posterPath = json['poster_path'];
     adult = json['adult'];
-    genreIds = json['genreIds'];
+    genreIds = json['genre_ids'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['id'] = id;
     data['title'] = title;
-    data['voteAverage'] = voteAverage;
-    data['posterPath'] = posterPath;
+    data['vote_average'] = voteAverage;
+    data['poster_path'] = posterPath;
     data['adult'] = adult;
-    data['genreIds'] = genreIds;
+    data['genre_ids'] = genreIds;
     return data;
   }
+}
+
+double? checkDouble(dynamic value) {
+  if(value is double) return value;
+  if(value is int) return value.toDouble();
+  if(value is String) return double.tryParse(value);
+  return null;
+}
+int? checkInt(dynamic value) {
+  if(value is int) return value;
+  if(value is double) return value.toInt();
+  if(value is String) return int.tryParse(value);
+  return null;
 }

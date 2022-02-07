@@ -31,16 +31,33 @@ import 'package:starmovie/app/modules/home/models/movie_home_model.dart';
 //   Future<Response> getMovies() => get(apiURL);
 // }
 
-class HomeProvider extends GetConnect {
-  Future<List<dynamic>> getMovies() async {
-    String apiURL =
-      "https://api.themoviedb.org/3/movie/now_playing?api_key=8ccec078028bd550c96dd69c7af7e74a&language=en-US&page=1";
+// class HomeProvider extends GetConnect {
+//   Future<List<dynamic>> getMovies() async {
+//     String apiURL =
+//       "https://api.themoviedb.org/3/movie/now_playing?api_key=8ccec078028bd550c96dd69c7af7e74a&language=en-US&page=1";
 
-    final response = await get(apiURL);
-    if (response.status.hasError) {
-      return Future.error([response.statusText]);
-    } else {
-      return response.body['results'];
-    }
+//     final response = await get(apiURL);
+//     if (response.status.hasError) {
+//       return Future.error([response.statusText]);
+//     } else {
+//       return response.body['results'];
+//     }
+//   }
+// }
+
+abstract class IHomeProvider {
+  Future<Response<MovieHomeModel>> getMovies(String path);
+}
+
+class HomeProvider extends GetConnect implements IHomeProvider {
+  @override
+  void onInit() {
+    super.onInit();
+    
+    httpClient.defaultDecoder = MovieHomeModel.fromJson;
+    httpClient.baseUrl = 'https://api.themoviedb.org/3';
   }
+
+  @override
+  Future<Response<MovieHomeModel>> getMovies(String path) => get(path);
 }
